@@ -1,0 +1,342 @@
+
+
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:paddle_business_guru/pages/mobile_checkout_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../bloc/skip_bloc/skip_bloc.dart';
+import '../pages/all_categories.dart';
+import '../pages/buy_course_page.dart';
+import '../pages/cart.dart';
+import '../pages/chapter_details/assignment_webview.dart';
+import '../pages/chapter_details/chapter_details.dart';
+import '../pages/chapter_details/pdf_viewer.dart';
+import '../pages/courses/cat_wise_courses.dart';
+import '../pages/courses/mycourses.dart';
+import '../pages/courses/saved_courses.dart';
+import '../pages/document_details.dart';
+import '../pages/document_grid.dart';
+import '../pages/enquiry_page.dart';
+import '../pages/feedback.dart';
+import '../pages/free_learning/free_learning_list.dart';
+import '../pages/free_learning/free_videos_list.dart';
+import '../pages/home/mainhomepage.dart';
+import '../pages/liveSessions/liveClasslist.dart';
+import '../pages/login/OtpPage.dart';
+import '../pages/login/login_page.dart';
+import '../pages/login/registration.dart';
+import '../pages/login/splash_screen.dart';
+import '../pages/login/usertypes.dart';
+import '../pages/login/welcome_page.dart';
+import '../pages/notifications.dart';
+import '../pages/profile.dart';
+import '../pages/search/searchPage.dart';
+import '../pages/skip_page.dart';
+import '../pages/t_and_c.dart';
+import '../pages/your_certificate_page.dart';
+import '../utilities/datatoclasses.dart';
+import 'app_data_sender_classes.dart';
+
+class RouteGenerator {
+  static String regstatus = "";
+
+  static Route<dynamic>? generateRoute(RouteSettings settings) {
+    final args = settings.arguments;
+
+    switch (settings.name) {
+      case '/splashScreen':
+        return MaterialPageRoute(builder: (_) => const SplashScreen());
+      case '/login':
+        return MaterialPageRoute(builder: (_) => const LoginPage());
+      case '/welcomeScreen':
+        return MaterialPageRoute(builder: (_) => const WelcomePage());
+      case '/home':
+        getregStatus();
+        return MaterialPageRoute(builder: (_) => const MainHomePage());
+
+      case '/profile':
+        return MaterialPageRoute(builder: (_) {
+          return BlocBuilder<SkipBloc, SkipState>(builder: (context, state) {
+            if (state is SkipCheckSuccessState) {
+              if (regstatus == "1") {
+                return const Profile();
+              } else {
+                return const SkipPage();
+              }
+            } else {
+              return const Profile();
+            }
+          });
+        });
+
+      case '/mycourses':
+        // datatomycourse argument = args as datatomycourse;
+        return MaterialPageRoute(
+          builder: (_) {
+            return BlocBuilder<SkipBloc, SkipState>(
+              builder: (context, state) {
+                if (state is SkipCheckSuccessState) {
+                  if (regstatus == "1") {
+                    return const MyCoursesPage();
+                  } else {
+                    return const SkipPage();
+                  }
+                } else {
+                  return const MyCoursesPage();
+                }
+              },
+            );
+          },
+        );
+      case '/livelist':
+        return MaterialPageRoute(
+          builder: (_) {
+            return BlocBuilder<SkipBloc, SkipState>(
+              builder: (context, state) {
+                if (state is SkipCheckSuccessState) {
+                  if (regstatus == "1") {
+                    return const LiveClassList();
+                  } else {
+                    return const SkipPage();
+                  }
+                } else {
+                  return const LiveClassList();
+                }
+              },
+            );
+          },
+        );
+      case '/searchpage':
+        return MaterialPageRoute(builder: (_) => const SearchPage());
+      case '/chapterDetails':
+        SingleData? argument = args as SingleData;
+        return MaterialPageRoute(
+            builder: (_) => ChapterDetails(
+                  chapId: argument.value,
+                ));
+      case '/otppage':
+        Datatootp argument = args as Datatootp;
+        return MaterialPageRoute(builder: (_) => Otppage(argument.mobile));
+      case '/registration':
+        return MaterialPageRoute(builder: (_) => const Registration());
+      case '/enquiry':
+        return MaterialPageRoute(builder: (_) => const Enquiry());
+      case '/t&c':
+        return MaterialPageRoute(builder: (_) => const TermsandConditions());
+
+      case '/usertype':
+        DatatoUserTypePage? argument = args as DatatoUserTypePage;
+        return MaterialPageRoute(
+            builder: (_) => UserTypes(
+                  name: argument.name,
+                  email: argument.email,
+                  referid: argument.referid,
+                  status: argument.status,
+                ));
+      case '/allcategories':
+        return MaterialPageRoute(builder: (_) => const AllCategories());
+      case '/mobileCheckout':
+        return MaterialPageRoute(builder: (_) => const MobileCheckoutWebView());
+      case '/cartpage':
+        return MaterialPageRoute(
+          builder: (_) {
+            return BlocBuilder<SkipBloc, SkipState>(
+              builder: (context, state) {
+                if (state is SkipCheckSuccessState) {
+                  if (regstatus == "1") {
+                    return const CartPage();
+                  } else {
+                    return const SkipPage();
+                  }
+                } else {
+                  return const CartPage();
+                }
+              },
+            );
+          },
+        );
+      case '/savedCourse':
+        return MaterialPageRoute(
+          builder: (_) {
+            return BlocBuilder<SkipBloc, SkipState>(
+              builder: (context, state) {
+                if (state is SkipCheckSuccessState) {
+                  if (regstatus == "1") {
+                    return const SavedCourse();
+                  } else {
+                    return const SkipPage();
+                  }
+                } else {
+                  return const SavedCourse();
+                }
+              },
+            );
+          },
+        );
+      case '/buyCourse':
+        return MaterialPageRoute(builder: (_) => const BuyChapter());
+      case '/feedback':
+        return MaterialPageRoute(builder: (_) => const FeedbackPage());
+      case '/certificate':
+        return MaterialPageRoute(builder: (_) => const CertificatePage());
+
+      case '/pdfviewer':
+        return MaterialPageRoute(builder: (_) => const Pdfview());
+      case '/freelearning':
+        return MaterialPageRoute(
+            builder: (_) => const FreeLearningCourseList());
+      case '/documents':
+        SingleData? argument = args as SingleData;
+        return MaterialPageRoute(
+          builder: (_) {
+            return BlocBuilder<SkipBloc, SkipState>(
+              builder: (context, state) {
+                if (state is SkipCheckSuccessState) {
+                  if (regstatus != "1") {
+                    if (argument.value == "ALL") {
+                      return DocumentGrid(
+                        buyStatus: argument.value,
+                      );
+                    } else {
+                      return const SkipPage();
+                    }
+                  } else {
+                    return DocumentGrid(
+                      buyStatus: argument.value,
+                    );
+                  }
+                } else {
+                  return DocumentGrid(
+                    buyStatus: argument.value,
+                  );
+                }
+              },
+            );
+          },
+        );
+      case '/documentsDetails':
+        return MaterialPageRoute(builder: (_) => const DocumentDetails());
+      case '/notifications':
+        return MaterialPageRoute(builder: (_) => const Notifications());
+      case '/catWiseCourses':
+        return MaterialPageRoute(builder: (_) => const CategoryWiseCourses());
+      case '/freeVideosList':
+        return MaterialPageRoute(builder: (_) => const FreeVideosListPage());
+      case '/assignments':
+        return MaterialPageRoute(builder: (_) => const AssignmentWebView());
+
+      default:
+        return null;
+    }
+  }
+
+  static void getregStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    regstatus = prefs.getString("registerstatus")!;
+  }
+}
+/////////////////////////////////////////////////////////////////////////////////////////
+
+/////
+
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:open_file_safe/open_file_safe.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:uuid/uuid.dart';
+
+Future<void> cameraRequest() async {
+  final status = await Permission.camera.status;
+  if (status == PermissionStatus.denied) {
+    await Permission.camera.request();
+  } else if (status == PermissionStatus.permanentlyDenied) {
+    await openAppSettings();
+  }
+}
+
+Color getColor(int index, int split) {
+  switch (index % split) {
+    case 0:
+      return const Color(0xffffadf0);
+    case 1:
+      return const Color(0xffDAEEFF);
+    case 2:
+      return const Color(0xffcfffdc);
+    case 3:
+      return const Color(0xffffeba4);
+    case 4:
+      return const Color(0xffffbdf0);
+    case 5:
+      return const Color(0xffffdba4);
+    default:
+      return const Color(0xffd6e5fa);
+  }
+}
+
+Future<void> getPermissionStatus() async {
+  await locationRequest();
+  await cameraRequest();
+  await storageRequest();
+}
+
+Future<void> locationRequest() async {
+  final status = await Permission.location.status;
+  if (status == PermissionStatus.denied) {
+    await Permission.location.request();
+  } else if (status == PermissionStatus.permanentlyDenied) {
+    await openAppSettings();
+  }
+}
+
+Future<void> micRequest() async {
+  final status = await Permission.microphone.status;
+  if (status == PermissionStatus.denied) {
+    await Permission.microphone.request();
+  } else if (status == PermissionStatus.permanentlyDenied) {
+    await openAppSettings();
+  }
+}
+
+Future<void> openFile(String filePath) async {
+  final result = await OpenFile.open(filePath);
+  if (kDebugMode) {
+    print(result.message);
+  }
+}
+
+Future<void> storageRequest() async {
+  final status = await Permission.storage.status;
+  if (status == PermissionStatus.denied) {
+    await Permission.storage.request();
+  } else if (status == PermissionStatus.permanentlyDenied) {
+    await openAppSettings();
+  }
+}
+/////generate Uuid
+
+class Methods {
+  Uuid uid = const Uuid();
+  String uimeno = "";
+
+  Future<String> createuid() async {
+    String deviceId = "";
+
+    deviceId = uid.v4();
+
+    return deviceId;
+  }
+
+  Future<String> generatetoken() async {
+    FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
+    String token = "";
+
+    token = (await firebaseMessaging.getToken())!.toString();
+    return token;
+  }
+}
+
+class NavKey {
+  static final navKey = GlobalKey<NavigatorState>();
+}
